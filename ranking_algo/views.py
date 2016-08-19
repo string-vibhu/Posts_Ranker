@@ -13,12 +13,12 @@ from math import exp
 # Create your views here.
 def load_posts(request):
 	module_dir = os.path.dirname(__file__)  # get current directory
-	file_path = os.path.join(module_dir, 'data.txt')
+	file_path = os.path.join(module_dir, 'Data/data.txt')
 	file=open(file_path)
 	filedata=file.read()
 	posts=filedata.split('#')
 	i=1
-	d=4
+	d=5
 	for p in posts:
 		post=p.split('$')
 		title=post[0]
@@ -31,11 +31,14 @@ def load_posts(request):
 		i=i+1
 
 	init_count()
-	return HttpResponse('Success.....!!!!!!!!!')
+	#calc_rank()
+	post_ranking()
+	posts=Post.objects.all().order_by("-rank")
+	return render(request, 'ranking_algo/post.html', {'posts_data': posts})
 
 def load_posts_today(request):
 	module_dir = os.path.dirname(__file__)  # get current directory
-	file_path = os.path.join(module_dir, 'data.txt')
+	file_path = os.path.join(module_dir, 'Data/data1.txt')
 	file=open(file_path)
 	filedata=file.read()
 	posts=filedata.split('#####')
@@ -45,15 +48,16 @@ def load_posts_today(request):
 		content=post[1]
 		a=Post(title=title, text=content,date=(datetime.now()))
 		a.save()
-	init_count()
-	return HttpResponse('Success.....!!!!!!!!!')
+	update_count()
+	post_ranking()
+	posts=Post.objects.all().order_by("-rank")
+	return render(request, 'ranking_algo/post.html', {'posts_data': posts})
 	
 def init_count():
     #all_post = Post.Objects.all()
     today_date = datetime.now().date()
-    print today_date
     #p4 = Post.Objects.filter(date__date='2016-08-13')
-    for i in range(0,5):
+    for i in range(1,6):
         p = Post.objects.filter(date__date = today_date - timedelta(days=i))
 
         for p1 in p:
@@ -78,11 +82,40 @@ def init_count():
           p1.comment_count = x1*c
           p1.share_count=x1*s
           p1.save()
+	
+def update_count():
+    today_date = datetime.now().date()
 
-def calc_rank(request):
-	post_ranking()
-	posts=Post.objects.all().order_by("-rank")
-	return render(request, 'ranking_algo/post.html', {'posts_data': posts})
+    for i in range(0,5):
+        p = Post.objects.filter(date__date = today_date - timedelta(days=i))
+
+
+        for p1 in p:
+
+          x1 = random.randint(0, 10-2*i)
+
+          if random.randint(0, 1):
+            a = random.randint(8, 10)
+            f = random.randint(0, 3)
+            r = random.randint(3, 5)
+            c = random.randint(0, 4)
+            s = random.uniform(1, 2)
+          else :
+            a = random.randint(0, 5)
+            f = random.randint(6, 9)
+            r = random.randint(0, 3)
+            c = random.randint(0, 4)
+            s = random.uniform(0, 0.5)
+
+          p1.auth_count = p1.auth_count+x1*a
+          p1.fake_count = p1.fake_count+x1*f
+          p1.rating = (p1.rating + r)/2
+          p1.comment_count = p1.comment_count + x1*c
+          p1.share_count=p1.share_count+x1*s
+          p1.save()
+
+
+
 
 def post_ranking():
   #today_date=datetime.now()
