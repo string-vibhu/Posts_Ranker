@@ -141,12 +141,6 @@ def post_ranking():
     timedifference = timezone.now() - posted_time
     timedifference = timedifference.total_seconds()/60
     timefactor = timedifference -1
-    print pow(1.001,fakes_count)*fakes_count/maxfactor.values()[0]*(1.0/6.0)
-    print '\n'
-    print str(rating_count/maxrating.values()[0]*(1.0/6.0))+'\n'
-    print (float)(comments_count)/(float)(maxcomment.values()[0])*(1.0/6.0)
-    print (float)(shares_count)/(float)(maxshare.values()[0])*(1.0/6.0)
-    print (float(2880**2)/(timefactor**2+float(2880**2)))
     Rank = (((authentication_count - pow(1.001,fakes_count)*fakes_count)/maxfactor.values()[0])*(1.0/6.0) + (float(rating_count)/float(maxrating.values()[0]))*(1.0/6.0) + (float(comments_count)/float(maxcomment.values()[0]))*(1.0/6.0) + (float(shares_count)/float(maxshare.values()[0]))*(1.0/6.0))*(float(2880**2)/(timefactor**2+float(2880**2)))
     single_post.rank=Rank
     single_post.save()
